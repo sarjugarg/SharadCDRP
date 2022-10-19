@@ -98,18 +98,23 @@ public class CP1FileTransfer {
 
     }
 
-    static void saveDatainDb(Connection conn, String source, String operator, String name, String cdrRecdServer, String fileDate, long filesize) {
-        try {
+    static void saveDatainDb(Connection conn, String source, String operator, String name, String cdrRecdServer, String fileDate, long filesize) throws SQLException {
+    	Statement stmt = null;
+    	try {
             String query = "insert into cdr_file_records_db ( CREATED_ON ,SOURCE ,OPERATOR, FILE_NAME , CDR_RECD_SERVER , STATUS_SIG1 ,STATUS_SIG2  , FILE_DATE , file_size, record_size) "
                     + " values( current_timestamp , '" + source + "' , '" + operator + "' ,  '" + name + "' ,   '" + cdrRecdServer + "' , 'INIT' , 'INIT'   ,   '" + fileDate + "' ,    '" + filesize + "' , (  " + filesize + " / (select  avg_record_size from operator_source_avg_record_size where operator = '" + operator + "' and source  =   '" + source + "'  )         )    )";
             log.info(query);
-            Statement stmt = conn.createStatement();
+             stmt = conn.createStatement();
             stmt.executeUpdate(query);
-            stmt.close();
+            
         } catch (Exception e) {
             log.info("Failed  " + e);
             e.printStackTrace();
         }
+        finally {
+        	stmt.close();
+        }
+        
     }
 
 }
