@@ -109,19 +109,14 @@ public class CP1FileTransfer {
             log.info(query);
       
             stmt.executeUpdate(query);
-            
         } catch (Exception e) {
             log.info("Failed  " + e);
             e.printStackTrace();
         }
         finally {
-        	
-				stmt.close();
-			 
-        }
-        
+        			stmt.close();
+	  }
     }
-
 }
 
 //    public static void main(String[] args) {
