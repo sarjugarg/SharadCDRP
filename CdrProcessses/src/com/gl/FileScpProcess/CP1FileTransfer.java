@@ -84,7 +84,10 @@ public class CP1FileTransfer {
                     saveDatainDb(conn, source_param.trim(), operator_param, file.getName(), cdrRecdServer, fileDate, fileSize);
                 } catch (IOException e) {
                     log.info("Failed to move the file due to reason : " + e.toString());
-                }
+                } catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
             }
         }
         try {
@@ -98,13 +101,13 @@ public class CP1FileTransfer {
 
     }
 
-    static void saveDatainDb(Connection conn, String source, String operator, String name, String cdrRecdServer, String fileDate, long filesize) {
-    	Statement stmt = null;
+    static void saveDatainDb(Connection conn, String source, String operator, String name, String cdrRecdServer, String fileDate, long filesize) throws SQLException {
+    	Statement stmt = conn.createStatement();;
     	try {
             String query = "insert into cdr_file_records_db ( CREATED_ON ,SOURCE ,OPERATOR, FILE_NAME , CDR_RECD_SERVER , STATUS_SIG1 ,STATUS_SIG2  , FILE_DATE , file_size, record_size) "
                     + " values( current_timestamp , '" + source + "' , '" + operator + "' ,  '" + name + "' ,   '" + cdrRecdServer + "' , 'INIT' , 'INIT'   ,   '" + fileDate + "' ,    '" + filesize + "' , (  " + filesize + " / (select  avg_record_size from operator_source_avg_record_size where operator = '" + operator + "' and source  =   '" + source + "'  )         )    )";
             log.info(query);
-             stmt = conn.createStatement();
+      
             stmt.executeUpdate(query);
             
         } catch (Exception e) {
@@ -112,12 +115,9 @@ public class CP1FileTransfer {
             e.printStackTrace();
         }
         finally {
-        	try {
+        	
 				stmt.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			 
         }
         
     }
